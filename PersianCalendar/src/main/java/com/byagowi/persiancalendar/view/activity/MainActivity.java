@@ -30,6 +30,7 @@ import com.byagowi.persiancalendar.view.fragment.CompassFragment;
 import com.byagowi.persiancalendar.view.fragment.ConverterFragment;
 import com.byagowi.persiancalendar.view.fragment.PreferenceFragment;
 import com.github.praytimes.Coordinate;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
 
 import java.util.Collections;
@@ -64,7 +65,7 @@ import static com.byagowi.persiancalendar.Constants.PREF_THEME;
  *
  * @author ebraminio
  */
-public class MainActivity extends AppCompatActivity implements SharedPreferences.OnSharedPreferenceChangeListener, NavigationView.OnNavigationItemSelectedListener {
+public class MainActivity extends AppCompatActivity implements SharedPreferences.OnSharedPreferenceChangeListener, BottomNavigationView.OnNavigationItemSelectedListener {
 
     private static final int CALENDAR = 0,
             CONVERTER = 1,
@@ -140,25 +141,25 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
         boolean isRTL = UIUtils.isRTL(this);
 
-        ActionBarDrawerToggle drawerToggle = new ActionBarDrawerToggle(this, binding.drawer, binding.toolbar, R.string.openDrawer, R.string.closeDrawer) {
-            int slidingDirection = isRTL ? -1 : +1;
+//        ActionBarDrawerToggle drawerToggle = new ActionBarDrawerToggle(this, binding.drawer, binding.toolbar, R.string.openDrawer, R.string.closeDrawer) {
+//            int slidingDirection = isRTL ? -1 : +1;
+//
+//            @Override
+//            public void onDrawerSlide(View drawerView, float slideOffset) {
+//                super.onDrawerSlide(drawerView, slideOffset);
+//                slidingAnimation(drawerView, slideOffset);
+//            }
+//
+//
+//            private void slidingAnimation(View drawerView, float slideOffset) {
+//                binding.appMainLayout.setTranslationX(slideOffset * drawerView.getWidth() * slidingDirection);
+//                binding.drawer.bringChildToFront(drawerView);
+//                binding.drawer.requestLayout();
+//            }
+//        };
 
-            @Override
-            public void onDrawerSlide(View drawerView, float slideOffset) {
-                super.onDrawerSlide(drawerView, slideOffset);
-                slidingAnimation(drawerView, slideOffset);
-            }
-
-
-            private void slidingAnimation(View drawerView, float slideOffset) {
-                binding.appMainLayout.setTranslationX(slideOffset * drawerView.getWidth() * slidingDirection);
-                binding.drawer.bringChildToFront(drawerView);
-                binding.drawer.requestLayout();
-            }
-        };
-
-        binding.drawer.addDrawerListener(drawerToggle);
-        drawerToggle.syncState();
+//        binding.drawer.addDrawerListener(drawerToggle);
+//        drawerToggle.syncState();
         String action = getIntent() != null ? getIntent().getAction() : null;
         if ("COMPASS_SHORTCUT".equals(action)) {
             selectItem(COMPASS);
@@ -181,26 +182,26 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             }
         }
 
-        binding.navigation.setNavigationItemSelectedListener(this);
-        AppCompatImageView seasonImage = binding.navigation
-                .getHeaderView(0).findViewById(R.id.season_image);
-        switch (getSeason()) {
-            case "SPRING":
-                seasonImage.setImageResource(R.drawable.spring);
-                break;
-
-            case "SUMMER":
-                seasonImage.setImageResource(R.drawable.summer);
-                break;
-
-            case "FALL":
-                seasonImage.setImageResource(R.drawable.fall);
-                break;
-
-            case "WINTER":
-                seasonImage.setImageResource(R.drawable.winter);
-                break;
-        }
+        binding.bottomNavigation.setOnNavigationItemSelectedListener(this);
+//        AppCompatImageView seasonImage = binding.navigation
+//                .getHeaderView(0).findViewById(R.id.season_image);
+//        switch (getSeason()) {
+//            case "SPRING":
+//                seasonImage.setImageResource(R.drawable.spring);
+//                break;
+//
+//            case "SUMMER":
+//                seasonImage.setImageResource(R.drawable.summer);
+//                break;
+//
+//            case "FALL":
+//                seasonImage.setImageResource(R.drawable.fall);
+//                break;
+//
+//            case "WINTER":
+//                seasonImage.setImageResource(R.drawable.winter);
+//                break;
+//        }
 
         creationDate = CalendarUtils.getGregorianToday();
         Utils.applyAppLanguage(this);
@@ -310,9 +311,9 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         Utils.initUtils(this);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-            binding.drawer.setLayoutDirection(UIUtils.isRTL(this) ? View.LAYOUT_DIRECTION_RTL : View.LAYOUT_DIRECTION_LTR);
-        }
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+//            binding.drawer.setLayoutDirection(UIUtils.isRTL(this) ? View.LAYOUT_DIRECTION_RTL : View.LAYOUT_DIRECTION_LTR);
+//        }
     }
 
     @Override
@@ -327,33 +328,33 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
     @Override
     public void onBackPressed() {
-        if (binding.drawer.isDrawerOpen(GravityCompat.START)) {
-            binding.drawer.closeDrawers();
-        } else if (menuPosition != DEFAULT) {
-            selectItem(DEFAULT);
-        } else {
-            CalendarFragment calendarFragment = (CalendarFragment) getSupportFragmentManager()
-                    .findFragmentByTag(CalendarFragment.class.getName());
-
-            if (calendarFragment != null) {
-                if (calendarFragment.closeSearch()) {
-                    return;
-                }
-            }
-
-            finish();
-        }
+//        if (binding.drawer.isDrawerOpen(GravityCompat.START)) {
+//            binding.drawer.closeDrawers();
+//        } else if (menuPosition != DEFAULT) {
+//            selectItem(DEFAULT);
+//        } else {
+//            CalendarFragment calendarFragment = (CalendarFragment) getSupportFragmentManager()
+//                    .findFragmentByTag(CalendarFragment.class.getName());
+//
+//            if (calendarFragment != null) {
+//                if (calendarFragment.closeSearch()) {
+//                    return;
+//                }
+//            }
+//
+//            finish();
+//        }
     }
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         // Checking for the "menu" key
         if (keyCode == KeyEvent.KEYCODE_MENU) {
-            if (binding.drawer.isDrawerOpen(GravityCompat.START)) {
-                binding.drawer.closeDrawers();
-            } else {
-                binding.drawer.openDrawer(GravityCompat.START);
-            }
+//            if (binding.drawer.isDrawerOpen(GravityCompat.START)) {
+//                binding.drawer.closeDrawers();
+//            } else {
+//                binding.drawer.openDrawer(GravityCompat.START);
+//            }
             return true;
         } else {
             return super.onKeyDown(keyCode, event);
@@ -380,15 +381,15 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     }
 
     public void selectItem(int item) {
-        onNavigationItemSelected(binding.navigation.getMenu().getItem(item));
+        onNavigationItemSelected(binding.bottomNavigation.getMenu().getItem(item));
     }
 
     @Override
     public boolean onNavigationItemSelected(MenuItem menuItem) {
-        if (menuItem.getItemId() == R.id.exit) {
-            finish();
-            return true;
-        }
+//        if (menuItem.getItemId() == R.id.exit) {
+//            finish();
+//            return true;
+//        }
 
         menuItem.setCheckable(true);
         menuItem.setChecked(true);
@@ -432,7 +433,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             }
         }
 
-        binding.drawer.closeDrawers();
+//        binding.drawer.closeDrawers();
         return true;
     }
 }
