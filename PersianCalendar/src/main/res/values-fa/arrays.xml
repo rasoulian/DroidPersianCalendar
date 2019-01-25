@@ -4,7 +4,7 @@
         <item>روشن</item>
         <item>تاریک</item>
         <item>مدرن</item>
-        <item>آبی</item>
+        <item>رودبار</item>
     </string-array>
 
     <string-array name="prayMethodsNames">
@@ -64,6 +64,13 @@
         <item>۰</item>
         <item>۱+</item>
         <item>۲+</item>
+    </string-array>
+
+    <string-array name="shift_work">
+        <item>روزکاری</item>
+        <item>استراحت</item>
+        <item>عصرکاری</item>
+        <item>شب‌کاری</item>
     </string-array>
 
 </resources>

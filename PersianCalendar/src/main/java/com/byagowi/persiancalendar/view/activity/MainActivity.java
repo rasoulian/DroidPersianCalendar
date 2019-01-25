@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -50,7 +51,6 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.view.GravityCompat;
 import androidx.databinding.DataBindingUtil;
 import androidx.navigation.NavDestination;
-import androidx.navigation.NavOptions;
 import androidx.navigation.Navigation;
 import dagger.android.support.DaggerAppCompatActivity;
 
@@ -64,7 +64,6 @@ import static com.byagowi.persiancalendar.Constants.LANG_FA;
 import static com.byagowi.persiancalendar.Constants.LANG_FA_AF;
 import static com.byagowi.persiancalendar.Constants.LANG_PS;
 import static com.byagowi.persiancalendar.Constants.LANG_UR;
-import static com.byagowi.persiancalendar.Constants.LIGHT_THEME;
 import static com.byagowi.persiancalendar.Constants.PREF_APP_LANGUAGE;
 import static com.byagowi.persiancalendar.Constants.PREF_HOLIDAY_TYPES;
 import static com.byagowi.persiancalendar.Constants.PREF_MAIN_CALENDAR_KEY;
@@ -90,7 +89,6 @@ public class MainActivity extends DaggerAppCompatActivity implements SharedPrefe
     private long creationDateJdn;
     private ActionBar actionBar;
     private boolean settingHasChanged = false;
-    private NavOptions mNavOptions;
     private ActivityMainBinding binding;
 
     @Override
@@ -98,7 +96,7 @@ public class MainActivity extends DaggerAppCompatActivity implements SharedPrefe
         // Don't replace below with appDependency.getSharedPreferences() ever
         // as the injection won't happen at the right time
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        setTheme(UIUtils.getThemeFromName(prefs.getString(PREF_THEME, LIGHT_THEME)));
+        setTheme(UIUtils.getThemeFromName(Utils.getThemeFromPreference(prefs)));
 
         Utils.applyAppLanguage(this);
 
@@ -120,8 +118,12 @@ public class MainActivity extends DaggerAppCompatActivity implements SharedPrefe
         setSupportActionBar(binding.toolbar);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            getWindow().setFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS,
-                    WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+            // https://learnpainless.com/android/material/make-fully-android-transparent-status-bar
+            Window win = getWindow();
+            WindowManager.LayoutParams winParams = win.getAttributes();
+            winParams.flags &= ~WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS;
+            win.setAttributes(winParams);
+            getWindow().setStatusBarColor(Color.TRANSPARENT);
         }
 
         boolean isRTL = UIUtils.isRTL(this);
@@ -132,7 +134,7 @@ public class MainActivity extends DaggerAppCompatActivity implements SharedPrefe
             @Override
             public void onDrawerSlide(View drawerView, float slideOffset) {
                 super.onDrawerSlide(drawerView, slideOffset);
-                slidingAnimation(drawerView, slideOffset);
+                slidingAnimation(drawerView, slideOffset / 1.5f);
             }
 
 
@@ -146,19 +148,19 @@ public class MainActivity extends DaggerAppCompatActivity implements SharedPrefe
         binding.drawer.addDrawerListener(drawerToggle);
         drawerToggle.syncState();
 
-        mNavOptions = new NavOptions.Builder()
-                .setEnterAnim(android.R.anim.fade_in)
-                .setExitAnim(android.R.anim.fade_out)
-                .setPopEnterAnim(android.R.anim.fade_in)
-                .setPopExitAnim(android.R.anim.fade_out)
-                .build();
+        Intent intent = getIntent();
+        if (intent != null) {
+            String action = intent.getAction();
+            if ("COMPASS".equals(action)) navigateTo(R.id.compass);
+            else if ("LEVEL".equals(action)) navigateTo(R.id.level);
+            else if ("CONVERTER".equals(action)) navigateTo(R.id.converter);
+            else if ("SETTINGS".equals(action)) navigateTo(R.id.settings);
+            else if ("DEVICE".equals(action)) navigateTo(R.id.deviceInfo);
+            else navigateTo(R.id.calendar);
 
-        String action = getIntent() != null ? getIntent().getAction() : null;
-        if ("COMPASS".equals(action)) navigateTo(R.id.compass);
-        else if ("LEVEL".equals(action)) navigateTo(R.id.level);
-        else if ("CONVERTER".equals(action)) navigateTo(R.id.converter);
-        else if ("SETTINGS".equals(action)) navigateTo(R.id.settings);
-        else navigateTo(R.id.calendar);
+            // So it won't happen again if the activity restarted
+            intent.setAction("");
+        }
 
         prefs.registerOnSharedPreferenceChangeListener(this);
 
@@ -173,10 +175,12 @@ public class MainActivity extends DaggerAppCompatActivity implements SharedPrefe
         ((ImageView) binding.navigation.getHeaderView(0).findViewById(R.id.season_image))
                 .setImageResource(getSeasonImage());
 
-        if (prefs.getString(PREF_APP_LANGUAGE, "N/A").equals("N/A")
+        String appLanguage = prefs.getString(PREF_APP_LANGUAGE, "N/A");
+        if (appLanguage == null) appLanguage = "N/A";
+        if (appLanguage.equals("N/A")
                 && !prefs.getBoolean(Constants.CHANGE_LANGUAGE_IS_PROMOTED_ONCE, false)) {
             Snackbar snackbar = Snackbar.make(getCoordinator(), "✖  Change app language?",
-                    10000);
+                    7000);
             View snackbarView = snackbar.getView();
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
                 snackbarView.setLayoutDirection(View.LAYOUT_DIRECTION_LTR);
@@ -210,6 +214,27 @@ public class MainActivity extends DaggerAppCompatActivity implements SharedPrefe
         }
 
         creationDateJdn = CalendarUtils.getTodayJdn();
+
+        if (Utils.getMainCalendar() == CalendarType.SHAMSI &&
+                Utils.isIranHolidaysEnabled() &&
+                (CalendarUtils.getTodayOfCalendar(CalendarType.SHAMSI).getYear() > Utils.getMaxSupportedYear())) {
+            Snackbar snackbar = Snackbar.make(getCoordinator(), getString(R.string.outdated_app),
+                    10000);
+            TextView text = snackbar.getView().findViewById(com.google.android.material.R.id.snackbar_text);
+            text.setTextColor(Color.WHITE);
+
+            snackbar.setAction(getString(R.string.update), view -> {
+                final String appPackageName = getPackageName();
+                try {
+                    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + appPackageName)));
+                } catch (android.content.ActivityNotFoundException anfe) {
+                    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=" + appPackageName)));
+                }
+            });
+            snackbar.setActionTextColor(getResources().getColor(R.color.dark_accent));
+            snackbar.show();
+        }
+
         Utils.applyAppLanguage(this);
     }
 
@@ -228,7 +253,7 @@ public class MainActivity extends DaggerAppCompatActivity implements SharedPrefe
         }
 
         Navigation.findNavController(this, R.id.nav_host_fragment)
-                .navigate(id, null, mNavOptions);
+                .navigate(id, null, null);
     }
 
     public CoordinatorLayout getCoordinator() {
@@ -262,11 +287,13 @@ public class MainActivity extends DaggerAppCompatActivity implements SharedPrefe
             boolean changeToGregorianCalendar = false;
             boolean changeToPersianCalendar = false;
             boolean changeToIranEvents = false;
+            boolean removeAllEvents = false;
             String lang = sharedPreferences.getString(PREF_APP_LANGUAGE, DEFAULT_APP_LANGUAGE);
             if (lang == null) lang = "";
             switch (lang) {
                 case LANG_EN_US:
                     changeToGregorianCalendar = true;
+                    removeAllEvents = true;
                     break;
                 case LANG_FA:
                     persianDigits = true;
@@ -321,6 +348,15 @@ public class MainActivity extends DaggerAppCompatActivity implements SharedPrefe
                         (currentHolidays.size() == 1 && currentHolidays.contains("afghanistan_holidays"))) {
                     editor.putStringSet(PREF_HOLIDAY_TYPES,
                             new HashSet<>(Collections.singletonList("iran_holidays")));
+                }
+            }
+            if (removeAllEvents) {
+                Set<String> currentHolidays =
+                        sharedPreferences.getStringSet(PREF_HOLIDAY_TYPES, new HashSet<>());
+
+                if (currentHolidays == null || currentHolidays.isEmpty() ||
+                        (currentHolidays.size() == 1 && currentHolidays.contains("iran_holidays"))) {
+                    editor.putStringSet(PREF_HOLIDAY_TYPES, new HashSet<>());
                 }
             }
             if (changeToGregorianCalendar) {

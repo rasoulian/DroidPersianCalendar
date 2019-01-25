@@ -12,11 +12,14 @@ import com.byagowi.persiancalendar.adapter.CalendarItemAdapter;
 import com.byagowi.persiancalendar.calendar.AbstractDate;
 import com.byagowi.persiancalendar.calendar.CivilDate;
 import com.byagowi.persiancalendar.databinding.CalendarsViewBinding;
+import com.byagowi.persiancalendar.praytimes.Clock;
 import com.byagowi.persiancalendar.util.AstronomicalUtils;
 import com.byagowi.persiancalendar.util.CalendarType;
 import com.byagowi.persiancalendar.util.CalendarUtils;
+import com.byagowi.persiancalendar.util.UIUtils;
 import com.byagowi.persiancalendar.util.Utils;
 
+import java.util.Calendar;
 import java.util.List;
 
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -145,6 +148,23 @@ public class CalendarsView extends FrameLayout {
                     Utils.formatNumber(weeksCount - currentWeek),
                     Utils.formatNumber(12 - mainDate.getMonth()));
             mBinding.startAndEndOfYearDiff.setText(String.format("%s\n%s", startOfYearText, endOfYearText));
+
+            String equinox = "";
+            if (Utils.getMainCalendar() == chosenCalendarType &&
+                    chosenCalendarType == CalendarType.SHAMSI) {
+                if ((mainDate.getMonth() == 12 && mainDate.getDayOfMonth() >= 20) ||
+                        (mainDate.getMonth() == 1 && mainDate.getDayOfMonth() == 1)) {
+                    int addition = mainDate.getMonth() == 12 ? 1 : 0;
+                    Calendar springEquinox = CalendarUtils.getSpringEquinox(mainDate.toJdn());
+                    equinox = String.format(context.getString(R.string.spring_equinox),
+                            Utils.formatNumber(mainDate.getYear() + addition),
+                            UIUtils.getFormattedClock(
+                                    new Clock(springEquinox.get(Calendar.HOUR_OF_DAY),
+                                            springEquinox.get(Calendar.MINUTE)), true));
+                }
+            }
+            mBinding.equinox.setText(equinox);
+            mBinding.equinox.setVisibility(TextUtils.isEmpty(equinox) ? GONE : VISIBLE);
         }
 
         mBinding.getRoot().setContentDescription(CalendarUtils.getA11yDaySummary(context, jdn,

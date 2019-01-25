@@ -4,7 +4,7 @@
         <item>ڕووناک</item>
         <item>تاریک</item>
         <item>نۆژەن</item>
-        <item>شین</item>
+        <item>ڕووبار</item>
     </string-array>
 
     <string-array name="prayMethodsNames">
@@ -64,6 +64,13 @@
         <item>٠</item>
         <item>١+</item>
         <item>٢+</item>
+    </string-array>
+
+    <string-array name="shift_work">
+        <item>ڕۆژکاری</item>
+        <item>پشوو</item>
+        <item>ئێوارەکاری</item>
+        <item>شەوکاری</item>
     </string-array>
 
 </resources>
