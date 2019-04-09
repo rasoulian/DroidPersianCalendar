@@ -1114,5 +1114,3 @@ public class SolarPosition {
         return limitMinutes(4.0 * (M - 0.0057183 - α + Δψ * Math.cos(Math.toRadians(ε))));
     }
 }
-
-

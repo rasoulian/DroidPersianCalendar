@@ -11,14 +11,14 @@
         android:orientation="vertical">
 
         <!-- sun content -->
-        <com.byagowi.persiancalendar.view.sunrisesunset.SunView
+        <com.byagowi.persiancalendar.ui.calendar.times.SunView
             android:id="@+id/sunView"
             android:layout_width="match_parent"
             android:layout_height="100dp"
             android:layout_marginTop="10dp" />
 
         <!-- Times -->
-        <com.byagowi.persiancalendar.view.UntouchableRecyclerView
+        <com.byagowi.persiancalendar.ui.calendar.times.UntouchableRecyclerView
             android:id="@+id/timesRecyclerView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

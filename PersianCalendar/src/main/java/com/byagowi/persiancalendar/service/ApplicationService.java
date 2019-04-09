@@ -6,8 +6,8 @@ import android.content.IntentFilter;
 import android.os.IBinder;
 import android.util.Log;
 
-import com.byagowi.persiancalendar.util.UpdateUtils;
-import com.byagowi.persiancalendar.util.Utils;
+import com.byagowi.persiancalendar.utils.UpdateUtils;
+import com.byagowi.persiancalendar.utils.Utils;
 
 import java.lang.ref.WeakReference;
 
@@ -22,6 +22,7 @@ import androidx.annotation.Nullable;
 public class ApplicationService extends Service {
 
     private static WeakReference<ApplicationService> instance;
+    private final BroadcastReceivers receiver = new BroadcastReceivers();
 
     @Nullable
     public static ApplicationService getInstance() {
@@ -44,12 +45,18 @@ public class ApplicationService extends Service {
         intentFilter.addAction(Intent.ACTION_TIME_CHANGED);
         intentFilter.addAction(Intent.ACTION_SCREEN_ON);
 //        intentFilter.addAction(Intent.ACTION_TIME_TICK);
-        registerReceiver(new BroadcastReceivers(), intentFilter);
+        registerReceiver(receiver, intentFilter);
 
         Utils.updateStoredPreference(getApplicationContext());
         Utils.loadApp(this);
         UpdateUtils.update(getApplicationContext(), true);
 
         return START_STICKY;
+    }
+
+    @Override
+    public void onDestroy() {
+        unregisterReceiver(receiver);
+        super.onDestroy();
     }
 }

@@ -9,6 +9,7 @@
     "http://pcci.ir/file/2015/11/1395.zip",
     "https://calendar.ut.ac.ir/Fa/News/Data/Doc/calendar%201396-full.pdf",
     "https://calendar.ut.ac.ir/Fa/News/Data/Doc/Calendar%201397-Full.pdf",
+    "https://calendar.ut.ac.ir/Fa/News/Data/Doc/Calendar%201398-Full.pdf",
     "https://www.tasnimnews.com/fa/news/1395/11/10/1310977/",
 
     "https://raw.githubusercontent.com/ilius/starcal/master/plugins/iran-jalali-data.txt",
@@ -775,7 +776,7 @@
       "title": "روز صنعت پتروشیمی" },
 
     { "holiday": false, "month": 10, "day": 9, "type": "Iran",
-      "title": "۹ دی، روز بصیرت و میثاق" },
+      "title": "۹ دی" },
 
     { "holiday": false, "month": 10, "day": 13, "type": "Iran",
       "title": "ابلاغ پیام تاریخی امام خمینی به گورباچف رهبر شوروی سابق (۱۳۶۷ ه‍.ش)" },
@@ -1170,8 +1171,6 @@
       "title": "وفات حضرت عبدالمطلب (ع)" },
     { "holiday": false, "month": 6, "day": 12, "type": "Islamic Iran",
       "title": "حرکت پیامبر به سمت خیبر" },
-    { "holiday": false, "month": 6, "day": 13, "type": "Islamic Iran",
-      "title": "وفات ام‌البنین (س)" },
     { "holiday": false, "month": 6, "day": 19, "type": "Islamic Iran",
       "title": "ازدواج حضرت عبداللّه (ع) و آمنه (س)" },
     { "holiday": false, "month": 6, "day": 21, "type": "Islamic Iran",

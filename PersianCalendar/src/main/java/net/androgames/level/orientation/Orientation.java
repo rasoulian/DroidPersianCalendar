@@ -61,5 +61,4 @@ public enum Orientation {
         }
         return false;
     }
-
 }

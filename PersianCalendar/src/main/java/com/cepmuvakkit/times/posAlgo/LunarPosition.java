@@ -412,8 +412,4 @@ public class LunarPosition {
                 - AstroLib.getApparentAtmosphericRefraction(0) * AstroLib.getWeatherCorrectionCoefficent(temperature, pressure)
                 - AstroLib.getAltitudeCorrection(altitude);
     }
-
 }
-
-
-

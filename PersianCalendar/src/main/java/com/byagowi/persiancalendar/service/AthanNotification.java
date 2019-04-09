@@ -16,23 +16,16 @@ import android.widget.RemoteViews;
 import com.byagowi.persiancalendar.BuildConfig;
 import com.byagowi.persiancalendar.Constants;
 import com.byagowi.persiancalendar.R;
-import com.byagowi.persiancalendar.util.UIUtils;
-import com.byagowi.persiancalendar.util.Utils;
+import com.byagowi.persiancalendar.utils.Utils;
 
 import java.util.concurrent.TimeUnit;
 
-import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
 
 public class AthanNotification extends Service {
 
     private static final int NOTIFICATION_ID = 1002;
-    String NOTIFICATION_CHANNEL_ID = "1002";
-
-    @Nullable
-    public static AthanNotification getInstance() {
-        return null;
-    }
+    private static String NOTIFICATION_CHANNEL_ID = String.valueOf(NOTIFICATION_ID);
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -60,7 +53,7 @@ public class AthanNotification extends Service {
 
             String title = intent == null
                     ? ""
-                    : getString(UIUtils.getPrayTimeText(intent.getStringExtra(Constants.KEY_EXTRA_PRAYER_KEY)));
+                    : getString(Utils.getPrayTimeText(intent.getStringExtra(Constants.KEY_EXTRA_PRAYER_KEY)));
             String cityName = Utils.getCityName(this, false);
             String subtitle = TextUtils.isEmpty(cityName)
                     ? ""
@@ -106,5 +99,4 @@ public class AthanNotification extends Service {
 
         return super.onStartCommand(intent, flags, startId);
     }
-
 }
